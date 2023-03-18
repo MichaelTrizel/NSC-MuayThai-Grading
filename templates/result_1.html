@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Result</title>
+    <style>
+        body {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			height: 100vh;
+		}
+        .container {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: flex-start;
+			margin-top: 15px;
+		}
+		button {
+			width: 80px;
+            height: 30px;
+			background-color: #4CAF50;
+			border: none; 
+			color: white;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block; 
+			font-size: 16px; 
+			margin-top: 20px;
+			cursor: pointer;
+			border-radius: 25px;
+		}
+		button:hover {
+			background-color: #3e8e41;
+		}
+    </style>
+</head>
+<body>
+    <h1>เกรดการออกท่ามวยไทย</h1>
+    <h2>ท่ามวยไทย : {{ pier }}</h2>
+    <h3>เกรดที่ได้รับ : B โดยมีเปอร์เซ็นความคล้ายอยู่ที่ 72.54%</h3>
+
+    <video width="640" height="360" controls muted>
+        {% for file_type in ['mp4', 'webm', 'ogg', 'quicktime'] %}
+            <source src="{{ url_for('video', filename=video_file) }}" type="video/{{ file_type }}">
+        {% endfor %}
+        Your browser does not support the video tag.
+    </video>
+
+    <button onclick="window.location.href='/'">หน้าหลัก</button>
+</body>
+</html>

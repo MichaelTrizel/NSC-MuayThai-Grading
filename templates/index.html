@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>MuayThai Grading</title>
+	<style>
+		body {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			height: 100vh;
+		}
+		.my-input {
+			width: 80px;
+            height: 30px;
+			background-color: #4CAF50;
+			border: none;
+			color: white;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 16px;
+			cursor: pointer;
+			border-radius: 25px;
+    	}
+    	.my-input:hover {
+    	    background-color: #3e8e41;
+    	}
+	</style>
+</head>
+<body>
+	<h1>โปรแกรมประเมินการออกท่ามวยไทย</h1>
+
+	<form action="/pier-selection" method="POST" enctype="multipart/form-data">
+		<label>กรุณาเลือกท่ามวยไทย</label>
+		<select name="pier">
+			<option value="default" selected disabled hidden>ท่ามวยไทย</option>
+			<option value="pier1">ท่าสลับฟันปลา</option>
+			<option value="pier2">ท่าตาเถรค้ำพัก</option>
+			<option value="pier3">ท่ามอญยันหลัก</option>
+			<option value="pier4">ท่าดับชวาลา</option>
+			<option value="pier5">ท่าหักคอเอราวัณ</option>
+		</select>
+		<br><br>
+		<label>Upload video:</label>
+		<input type="file" name="video">
+		<br><br>
+		<input type="submit" class="my-input my-input:hover" value="Submit">
+	</form>
+
+</body>
+</html>
