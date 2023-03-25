@@ -24,6 +24,6 @@ htmlcov/
 .coverage.*
 *,cover
 
-# Video File
-*.mp4
-*.MOV
+# Ignore uploaded_video file
+/*
+!/upload_video/

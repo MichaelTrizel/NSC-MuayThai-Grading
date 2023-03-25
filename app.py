@@ -5,6 +5,7 @@ import os
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'upload_video'
+app.config['TUTORIAL_FOLDER'] = 'tutorial'
 app.secret_key = '198237645'
 
 env = Environment()
@@ -65,6 +66,14 @@ def pier_selection():
 @app.route('/upload_video/<filename>')
 def video(filename):
 	return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+@app.route('/tutorial/<filename>')
+def tutorial(filename):
+	return send_from_directory(app.config['TUTORIAL_FOLDER'], filename)
+
+# @app.route('/upload_image/<filename>')
+# def image(filename):
+# 	return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 @app.route('/loading')
 def loading():
