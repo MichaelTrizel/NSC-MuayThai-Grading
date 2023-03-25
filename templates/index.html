@@ -51,8 +51,8 @@
 	<script>
 		function showVideo(videoURL) {
 			var video = document.getElementById("video");
-			video.src = "{{ url_for('tutorial', filename='') }}" + videoURL + '.MOV';
-			video.type = "video/quicktime"
+			video.src = "{{ url_for('tutorial', filename='') }}" + videoURL + '.mp4';
+			video.type = "video/mp4"
 			video.style.display = "block";
 		}
 	</script>

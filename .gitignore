@@ -26,4 +26,4 @@ htmlcov/
 
 # Ignore uploaded_video file
 /*
-!/upload_video/
+!/tutorial/
