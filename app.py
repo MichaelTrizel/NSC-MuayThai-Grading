@@ -26,16 +26,16 @@ def pier_selection():
 	if request.method == 'POST':
 		# Check if pier is selected
 		if 'pier' not in request.form:
-			return "Error: no pier was selected"
+			return render_template('error1.html')
 
 		# Check if file is uploaded
 		if 'video' not in request.files:
-			return 'No video uploaded', 400
+			return render_template('error2.html')
 
 		video_file = request.files['video']
 		# Check if file is not empty
 		if video_file.filename == '':
-			return 'No selected file', 400
+			return render_template('error2.html')
 
 		# Save file to upload folder
 		video_path = os.path.join(upload_folder, video_file.filename)
