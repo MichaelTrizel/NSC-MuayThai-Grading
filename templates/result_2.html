@@ -43,7 +43,7 @@
 <body>
     <h1>เกรดการออกท่ามวยไทย</h1>
     <h2>ท่ามวยไทย : {{ pier }}</h2>
-    <h3>Step ที่ยังออกไม่ชัดเจน : Step 3, 4</h3>
+    <h3>Step ที่ยังออกไม่ชัดเจน : Step {{ step_missed_str }}</h3>
 
     <video width="640" height="360" controls muted>
         {% for file_type in ['mp4', 'webm', 'ogg', 'quicktime'] %}

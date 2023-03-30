@@ -50,12 +50,12 @@
 		var seconds = 0;
 		var timer = setInterval(function() {
 			seconds++;
-			document.querySelector('.timer').innerHTML = 'Grading... ' + seconds + 's';
+			document.querySelector('.timer').innerHTML = 'Grading... ';
 		}, 1000);
 
 		setTimeout(function() {
-			window.location.href = '/result_1';
-		}, 3000); // Timer (milisecond)
+			window.location.href = '/result';
+		}, 1000); // Timer (milisecond)
 	</script>
 </body>
 </html>

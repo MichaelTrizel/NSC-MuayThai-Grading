@@ -24,8 +24,8 @@ env.globals.update(enumerate=enumerate)
 def index():
 	return render_template('index.html')
 
-@app.route('/pier-selection', methods=['GET', 'POST'])
-def pier_selection():
+@app.route('/validate', methods=['GET', 'POST'])
+def validate():
 
 	upload_folder = './upload_video/'
 	if not os.path.exists(upload_folder):
@@ -95,9 +95,17 @@ def find_missing(lst, step):
 
 @app.route('/loading')
 def loading():
+	return render_template('loading.html')
+
+@app.route('/result')
+def result():
 	video_file = session.get('video_file',None)
 	pier = session.get('pier',None)
 	video_path = session.get('video_path',None)
+
+	# if video_file is None or pier is None:
+	# 	return redirect('/')
+	# return render_template('loading.html', video_file=video_file, pier=pier)
 
 	#Model code
 	user_folder = './user_data/'
@@ -197,6 +205,8 @@ def loading():
 		#Answer
 		step_missed_str = ', '.join(map(str, step_missed))
 		print(step_missed_str)
+
+		return render_template('result_2.html', video_file=video_file, pier=pier, step_missed_str=step_missed_str)
 	
 	# This is result_1
 	else:
@@ -247,27 +257,28 @@ def loading():
 		elif t_score < grade_df.loc[grade_df['grade'] == 'D', 'max'].iloc[0]:
 			grade = 'D'
 		print(grade)
+
+		similarity = round(similarity, 2)
+
+		return render_template('result_1.html', video_file=video_file, pier=pier, similarity=similarity, grade=grade)
+	
 	#End of model code
 
-	if video_file is None or pier is None:
-		return redirect('/')
-	return render_template('loading.html', video_file=video_file, pier=pier)
+# @app.route('/result_1')
+# def result_1():
+# 	video_file = session.get('video_file',None)
+# 	pier = session.get('pier',None)
+# 	if video_file is None or pier is None:
+# 		return redirect('/')
+# 	return render_template('result_1.html', video_file=video_file, pier=pier)
 
-@app.route('/result_1')
-def result_1():
-	video_file = session.get('video_file',None)
-	pier = session.get('pier',None)
-	if video_file is None or pier is None:
-		return redirect('/')
-	return render_template('result_1.html', video_file=video_file, pier=pier)
-
-@app.route('/result_2')
-def result_2():
-	video_file = session.get('video_file',None)
-	pier = session.get('pier',None)
-	if video_file is None or pier is None:
-		return redirect('/')
-	return render_template('result_2.html', video_file=video_file, pier=pier)
+# @app.route('/result_2')
+# def result_2():
+# 	video_file = session.get('video_file',None)
+# 	pier = session.get('pier',None)
+# 	if video_file is None or pier is None:
+# 		return redirect('/')
+# 	return render_template('result_2.html', video_file=video_file, pier=pier)
 
 if __name__ == '__main__':
     app.run(debug=True)
