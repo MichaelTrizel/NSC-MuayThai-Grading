@@ -24,7 +24,6 @@ htmlcov/
 .coverage.*
 *,cover
 
-# Ignore every folder except tutorial and templates
-/*
-!/tutorial/
-!/templates/
+# Ignore upload_video & user_data
+upload_video/
+user_data/

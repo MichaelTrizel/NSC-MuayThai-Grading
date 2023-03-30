@@ -2,6 +2,15 @@ import os
 from flask import Flask, request, render_template, redirect, url_for, send_from_directory, session
 from jinja2 import Environment
 
+import mediapipe as mp
+import numpy as np
+import pandas as pd
+from scipy.spatial.distance import euclidean
+from fastdtw import fastdtw
+
+from Converter import Conveter
+from MuayThai import MuayThai
+
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'upload_video'
 app.config['TUTORIAL_FOLDER'] = 'tutorial'
@@ -57,6 +66,9 @@ def pier_selection():
 
 		session['video_file'] = video_file.filename
 		session['pier'] = pier
+		session['video_path'] = video_path
+
+		print(video_path)
 
 		return render_template(selected_pier + '.html', video_file=video_file.filename, pier=pier)
 	else:
@@ -74,10 +86,169 @@ def tutorial(filename):
 # def image(filename):
 # 	return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
+def find_missing(lst, step):
+	step_missed = []
+	for i in range(1, step+1):
+		if lst.count(i) == 0:
+			step_missed.append(i)
+	return step_missed
+
 @app.route('/loading')
 def loading():
 	video_file = session.get('video_file',None)
 	pier = session.get('pier',None)
+	video_path = session.get('video_path',None)
+
+	#Model code
+	user_folder = './user_data/'
+	if not os.path.exists(user_folder):
+		os.makedirs(user_folder)
+
+	user_converter = Conveter(video_path, user_folder)
+	clip_df = user_converter.convert_video_to_node()
+	user_converter.write_video_node_to_csv(clip_df, 'user.csv')
+
+
+	if pier == "ท่าสลับฟันปลา":
+		true_df = pd.read_csv('./trainer/1/true.csv')
+		cal_df = pd.read_csv('./trainer/1/cal.csv')
+		trainer_df = pd.read_csv('./trainer/1/clip.csv')
+
+		#Dtw
+		number_pier = 1
+		distance_point = 50
+
+		#Grading
+		grade_df = pd.read_csv('./trainer/1/grade.csv')
+		mean = 41.3333303030303
+		std = 32.76412259432642
+
+	elif pier == "ท่าตาเถรค้ำพัก":
+		true_df = pd.read_csv('./trainer/6/true.csv')
+		cal_df =pd.read_csv('./trainer/6/cal.csv')
+		trainer_df = pd.read_csv('./trainer/6/clip.csv')
+
+		#Dtw
+		number_pier = 6
+		distance_point = 160
+
+		#Grading
+		grade_df = pd.read_csv('./trainer/6/grade.csv')
+		mean = 41.3333303030303
+		std = 32.76412259432642
+
+	elif pier == "ท่ามอญยันหลัก":
+		true_df = pd.read_csv('./trainer/7/true.csv')
+		cal_df = pd.read_csv('./trainer/7/cal.csv')
+		trainer_df = pd.read_csv('./trainer/7/clip.csv')
+
+		#Dtw
+		number_pier = 7
+		distance_point = 50
+
+		#Grading
+		grade_df = pd.read_csv('./trainer/7/grade.csv')
+		mean = 41.3333303030303
+		std = 32.76412259432642
+
+	elif pier == "ท่าดับชวาลา":
+		true_df = pd.read_csv('./trainer/13/true.csv')
+		cal_df = pd.read_csv('./trainer/13/cal.csv')
+		trainer_df = pd.read_csv('./trainer/13/clip.csv')
+
+		#Dtw
+		number_pier = 13
+		distance_point = 200
+
+		#Grading
+		grade_df = pd.read_csv('./trainer/13/grade.csv')
+		mean = 41.3333303030303
+		std = 32.76412259432642
+
+	elif pier == "ท่าหักคอเอราวัณ":
+		true_df = pd.read_csv('./trainer/15/true.csv')
+		cal_df = pd.read_csv('./trainer/15/cal.csv')
+		trainer_df = pd.read_csv('./trainer/15/clip.csv')
+
+		#Dtw
+		number_pier = 15
+		distance_point = 150
+
+		#Grading
+		grade_df = pd.read_csv('./trainer/15/grade.csv')
+		mean = 41.3333303030303
+		std = 32.76412259432642
+
+	del true_df['Unnamed: 0']
+	del cal_df['Unnamed: 0']
+
+	user_df = pd.read_csv('./user_data/user.csv')
+	del user_df['Unnamed: 0']
+	user_muay = MuayThai(video_path, user_df, 4, true_df, cal_df)
+	user_point, user_true_frames, user_true_angles, user_true_steps = user_muay.check()
+	#print(user_point)
+
+	#Seperate to each result page
+	# This is result_2 
+	if (user_point < user_muay.step):
+		print('bad')
+		step_missed = find_missing(user_true_steps, 4)
+		
+		#Answer
+		step_missed_str = ', '.join(map(str, step_missed))
+		print(step_missed_str)
+	
+	# This is result_1
+	else:
+		print('good')
+
+		max_angles_len_user = len(max(user_true_angles, key=len))
+		user_padding_angle = [np.pad(arr, 
+                             pad_width=max_angles_len_user-len(arr), 
+                             mode='constant', 
+                             constant_values=0)[max_angles_len_user-len(arr):] for arr in user_true_angles]
+
+		clip_max = 35
+		point_criterion = 0
+
+		for i in range(1, clip_max+1):
+			trainer_muay = MuayThai(''.format(i), 
+							trainer_df[trainer_df['clip_name'] == '{}_{}'.format(number_pier, i)], 
+							4, true_df, cal_df)
+			
+			trainer_point, trainer_true_frames, trainer_true_angles, trainer_true_steps = trainer_muay.check()
+			max_angles_len_train = len(max(trainer_true_angles, key=len))
+			trainer_padding_angle = [np.pad(arr, 
+									pad_width=max_angles_len_train-len(arr), 
+									mode='constant', 
+									constant_values=0)[max_angles_len_train-len(arr):] for arr in trainer_true_angles]
+			
+			distance, path = fastdtw(trainer_padding_angle, user_padding_angle, dist=euclidean)
+			if (distance <= distance_point):
+				point_criterion += 1
+
+		#Answer of similarity
+		similarity = (point_criterion/clip_max)*100
+		print(similarity)
+
+		#Answer of grade
+		z_score = (similarity-mean)/std
+		t_score = (z_score*10)+50
+
+		print('T_score', t_score)
+
+		grade = 'N'
+		if t_score >= grade_df.loc[grade_df['grade'] == 'A', 'min'].iloc[0]:
+			grade = 'A'
+		elif t_score >= grade_df.loc[grade_df['grade'] == 'B', 'min'].iloc[0] and t_score < grade_df.loc[grade_df['grade'] == 'B', 'max'].iloc[0]:
+			grade = 'B'
+		elif t_score >= grade_df.loc[grade_df['grade'] == 'C', 'min'].iloc[0] and t_score < grade_df.loc[grade_df['grade'] == 'C', 'max'].iloc[0]:
+			grade = 'C'
+		elif t_score < grade_df.loc[grade_df['grade'] == 'D', 'max'].iloc[0]:
+			grade = 'D'
+		print(grade)
+	#End of model code
+
 	if video_file is None or pier is None:
 		return redirect('/')
 	return render_template('loading.html', video_file=video_file, pier=pier)
