@@ -170,7 +170,7 @@ def result():
 
 		#Dtw
 		number_pier = 13
-		distance_point = 200
+		distance_point = 150
 
 		#Grading
 		grade_df = pd.read_csv('./trainer/13/grade.csv')
