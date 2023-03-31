@@ -121,6 +121,7 @@ def result():
 		true_df = pd.read_csv('./trainer/1/true.csv')
 		cal_df = pd.read_csv('./trainer/1/cal.csv')
 		trainer_df = pd.read_csv('./trainer/1/clip.csv')
+		true_backup_df = pd.read_csv('./trainer/1/true_backup.csv')
 
 		#Dtw
 		number_pier = 1
@@ -135,6 +136,7 @@ def result():
 		true_df = pd.read_csv('./trainer/6/true.csv')
 		cal_df =pd.read_csv('./trainer/6/cal.csv')
 		trainer_df = pd.read_csv('./trainer/6/clip.csv')
+		true_backup_df = pd.read_csv('./trainer/6/true_backup.csv')
 
 		#Dtw
 		number_pier = 6
@@ -149,6 +151,7 @@ def result():
 		true_df = pd.read_csv('./trainer/7/true.csv')
 		cal_df = pd.read_csv('./trainer/7/cal.csv')
 		trainer_df = pd.read_csv('./trainer/7/clip.csv')
+		true_backup_df = pd.read_csv('./trainer/7/true_backup.csv')
 
 		#Dtw
 		number_pier = 7
@@ -163,6 +166,7 @@ def result():
 		true_df = pd.read_csv('./trainer/13/true.csv')
 		cal_df = pd.read_csv('./trainer/13/cal.csv')
 		trainer_df = pd.read_csv('./trainer/13/clip.csv')
+		true_backup_df = pd.read_csv('./trainer/13/true_backup.csv')
 
 		#Dtw
 		number_pier = 13
@@ -177,6 +181,7 @@ def result():
 		true_df = pd.read_csv('./trainer/15/true.csv')
 		cal_df = pd.read_csv('./trainer/15/cal.csv')
 		trainer_df = pd.read_csv('./trainer/15/clip.csv')
+		true_backup_df = pd.read_csv('./trainer/15/true_backup.csv')
 
 		#Dtw
 		number_pier = 15
@@ -196,72 +201,72 @@ def result():
 	user_point, user_true_frames, user_true_angles, user_true_steps = user_muay.check()
 	#print(user_point)
 
-	#Seperate to each result page
+	# Seperate to each result page
 	# This is result_2 
 	if (user_point < user_muay.step):
-		print('bad')
-		step_missed = find_missing(user_true_steps, 4)
-		
-		#Answer
-		step_missed_str = ', '.join(map(str, step_missed))
-		print(step_missed_str)
+		print('bad1')
 
-		return render_template('result_2.html', video_file=video_file, pier=pier, step_missed_str=step_missed_str)
+		user_backup_muay = MuayThai(video_path, user_df, 4, true_backup_df, cal_df)
+		user_backup_point, user_backup_true_frames, user_backup_true_angles, user_backup_true_steps = user_backup_muay.check()
+
+		if (user_backup_point < user_backup_muay.step):
+			step_missed = find_missing(user_backup_true_steps, 4)
+			
+			#Answer
+			step_missed_str = ', '.join(map(str, step_missed))
+			print(step_missed_str)
+
+			return render_template('result_2.html', video_file=video_file, pier=pier, step_missed_str=step_missed_str)
+		
+		user_true_angles = user_backup_true_angles
 	
 	# This is result_1
-	else:
-		print('good')
+	print('good')
+	max_angles_len_user = len(max(user_true_angles, key=len))
+	user_padding_angle = [np.pad(arr, 
+                         pad_width=max_angles_len_user-len(arr), 
+                         mode='constant', 
+                         constant_values=0)[max_angles_len_user-len(arr):] for arr in user_true_angles]
+	clip_max = 35
+	point_criterion = 0
+	for i in range(1, clip_max+1):
+		trainer_muay = MuayThai(''.format(i), 
+						trainer_df[trainer_df['clip_name'] == '{}_{}'.format(number_pier, i)], 
+						4, true_df, cal_df)
+		
+		trainer_point, trainer_true_frames, trainer_true_angles, trainer_true_steps = trainer_muay.check()
+		max_angles_len_train = len(max(trainer_true_angles, key=len))
+		trainer_padding_angle = [np.pad(arr, 
+								pad_width=max_angles_len_train-len(arr), 
+								mode='constant', 
+								constant_values=0)[max_angles_len_train-len(arr):] for arr in trainer_true_angles]
+		
+		distance, path = fastdtw(trainer_padding_angle, user_padding_angle, dist=euclidean)
+		if (distance <= distance_point):
+			point_criterion += 1
 
-		max_angles_len_user = len(max(user_true_angles, key=len))
-		user_padding_angle = [np.pad(arr, 
-                             pad_width=max_angles_len_user-len(arr), 
-                             mode='constant', 
-                             constant_values=0)[max_angles_len_user-len(arr):] for arr in user_true_angles]
+	#Answer of similarity
+	similarity = (point_criterion/clip_max)*100
+	print(similarity)
 
-		clip_max = 35
-		point_criterion = 0
+	#Answer of grade
+	z_score = (similarity-mean)/std
+	t_score = (z_score*10)+50
+	print('T_score', t_score)
 
-		for i in range(1, clip_max+1):
-			trainer_muay = MuayThai(''.format(i), 
-							trainer_df[trainer_df['clip_name'] == '{}_{}'.format(number_pier, i)], 
-							4, true_df, cal_df)
-			
-			trainer_point, trainer_true_frames, trainer_true_angles, trainer_true_steps = trainer_muay.check()
-			max_angles_len_train = len(max(trainer_true_angles, key=len))
-			trainer_padding_angle = [np.pad(arr, 
-									pad_width=max_angles_len_train-len(arr), 
-									mode='constant', 
-									constant_values=0)[max_angles_len_train-len(arr):] for arr in trainer_true_angles]
-			
-			distance, path = fastdtw(trainer_padding_angle, user_padding_angle, dist=euclidean)
-			if (distance <= distance_point):
-				point_criterion += 1
+	grade = 'N'
+	if t_score >= grade_df.loc[grade_df['grade'] == 'A', 'min'].iloc[0]:
+		grade = 'A'
+	elif t_score >= grade_df.loc[grade_df['grade'] == 'B', 'min'].iloc[0] and t_score < grade_df.loc[grade_df['grade'] == 'B', 'max'].iloc[0]:
+		grade = 'B'
+	elif t_score >= grade_df.loc[grade_df['grade'] == 'C', 'min'].iloc[0] and t_score < grade_df.loc[grade_df['grade'] == 'C', 'max'].iloc[0]:
+		grade = 'C'
+	elif t_score < grade_df.loc[grade_df['grade'] == 'D', 'max'].iloc[0]:
+		grade = 'D'
+	print(grade)
 
-		#Answer of similarity
-		similarity = (point_criterion/clip_max)*100
-		print(similarity)
-
-		#Answer of grade
-		z_score = (similarity-mean)/std
-		t_score = (z_score*10)+50
-
-		print('T_score', t_score)
-
-		grade = 'N'
-		if t_score >= grade_df.loc[grade_df['grade'] == 'A', 'min'].iloc[0]:
-			grade = 'A'
-		elif t_score >= grade_df.loc[grade_df['grade'] == 'B', 'min'].iloc[0] and t_score < grade_df.loc[grade_df['grade'] == 'B', 'max'].iloc[0]:
-			grade = 'B'
-		elif t_score >= grade_df.loc[grade_df['grade'] == 'C', 'min'].iloc[0] and t_score < grade_df.loc[grade_df['grade'] == 'C', 'max'].iloc[0]:
-			grade = 'C'
-		elif t_score < grade_df.loc[grade_df['grade'] == 'D', 'max'].iloc[0]:
-			grade = 'D'
-		print(grade)
-
-		similarity = round(similarity, 2)
-
-		return render_template('result_1.html', video_file=video_file, pier=pier, similarity=similarity, grade=grade)
-	
+	similarity = round(similarity, 2)
+	return render_template('result_1.html', video_file=video_file, pier=pier, similarity=similarity, grade=grade)
 	#End of model code
 
 # @app.route('/result_1')
