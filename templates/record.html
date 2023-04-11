@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500&display=swap" rel="stylesheet">
+	<title>MuayThai Grading</title>
+	<style>
+		body {
+			font-family: 'Chakra Petch', sans-serif;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			height: 100vh;
+		}
+		.container {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: flex-start;
+			margin-top: 15px;
+		}
+		#video {
+			width: 854px;
+        	height: 480px;
+		}
+        button {
+			font-family: 'Chakra Petch', sans-serif;
+			width: 180px;
+            height: 30px;
+			background-color: #4CAF50;
+			border: none; 
+			color: white;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block; 
+			font-size: 16px; 
+			cursor: pointer;
+			border-radius: 25px;
+		}
+		button:hover {
+			background-color: #3e8e41;
+		}
+	</style>
+</head>
+<body>
+	<h1>โปรแกรมประเมินการออกท่ามวยไทย</h1>
+    <h2>{{ pier }}</h2>
+    <p class="timer" id="record_timer" hidden>Recording... </p>
+
+	<div class="container">
+        <video id="video" autoplay muted></video>
+    </div> <br>
+    <div>
+        <button id="startButton">Start Recording</button>
+        <button id="stopButton" style="margin-left: 20px;"  disabled>Stop Recording</button>
+    </div>
+    <script>
+        var video = document.querySelector('#video');
+        var startButton = document.querySelector('#startButton');
+        var stopButton = document.querySelector('#stopButton');
+        var mediaRecorder;
+        var recordedBlobs = [];
+
+        navigator.mediaDevices.getUserMedia({video: true, audio: true})
+        .then(function(stream) {
+            video.srcObject = stream;
+            mediaRecorder = new MediaRecorder(stream);
+
+            mediaRecorder.ondataavailable = function(event) {
+                if (event.data && event.data.size > 0) {
+                    recordedBlobs.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstop = function() {
+                var blob = new Blob(recordedBlobs, {type: 'video/mp4'});
+
+                var formData = new FormData();
+                formData.append('video', blob, 'recorded-video.mp4');
+
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(function(response) {
+                    console.log('Video uploaded successfully');
+                })
+                .catch(function(error) {
+                    console.error('Error uploading video', error);
+                });
+
+                recordedBlobs = [];
+
+                window.location.href = "validate_record";
+            };
+        })
+        .catch(function(error) {
+            console.error('Unable to get media stream', error);
+        });
+
+        startButton.addEventListener('click', function() {
+            mediaRecorder.start();
+            startButton.disabled = true;
+            stopButton.disabled = false;
+            record_timer.hidden = false;
+            var seconds = 0;
+            var timer = setInterval(function() {
+		    	seconds++;
+		    	document.querySelector('.timer').innerHTML = 'Recording... ' + seconds + 's';
+		    }, 1000);
+        });
+        
+        stopButton.addEventListener('click', function() {
+            mediaRecorder.stop();
+            startButton.disabled = false;
+            stopButton.disabled = true;
+            record_timer.hidden = true;
+        });
+    </script>
+
+</body>
+</html>

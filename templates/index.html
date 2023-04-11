@@ -50,10 +50,12 @@
 	</style>
 	<script>
 		function showVideo(videoURL) {
-			var video = document.getElementById("video");
-			video.src = "{{ url_for('tutorial', filename='') }}" + videoURL + '.mp4';
-			video.type = "video/mp4"
-			video.style.display = "block";
+			if (videoURL != "method1" && videoURL != "method2") {
+				var video = document.getElementById("video");
+				video.src = "{{ url_for('tutorial', filename='') }}" + videoURL + '.mp4';
+				video.type = "video/mp4"
+				video.style.display = "block";
+			}
 		}
 	</script>
 </head>
@@ -61,7 +63,7 @@
 	<h1>โปรแกรมประเมินการออกท่ามวยไทย</h1>
 
 	<div class="container">
-		<form action="/validate" method="POST" enctype="multipart/form-data">
+		<form action="/video" method="POST" enctype="multipart/form-data">
 			<label>กรุณาเลือกท่ามวยไทย</label>
 			<select name="pier" onchange="showVideo(this.value)">
 				<option value="default" selected disabled hidden>ท่ามวยไทย</option>
@@ -72,10 +74,14 @@
 				<option value="pier5">ท่าหักคอเอราวัณ</option>
 			</select>
 			<br><br>
-			<video id="video" style="display: none;" controls muted></video>
-			<br>
-			<label>Upload video:</label>
-			<input type="file" name="video">
+            <video id="video" style="display: none;" controls muted></video>
+            <br>
+            <label>กรุณาเลือกวิธีส่งวิดีโอ</label>
+			<select name="video_method">
+				<option value="default" selected disabled hidden>วิธีส่งวิดีโอ</option>
+				<option value="method1">Upload ด้วยตัวเอง</option>
+				<option value="method2">Record ด้วยเครื่องคอมพิวเตอร์</option>
+			</select>
 			<br><br>
 			<input type="submit" class="my-input my-input:hover" value="Submit">
 		</form>

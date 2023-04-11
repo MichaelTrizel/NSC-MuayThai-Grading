@@ -46,7 +46,7 @@
 
 	<video width="640" height="360" controls muted>
 		{% for file_type in ['mp4', 'webm', 'ogg', 'quicktime'] %}
-			<source src="{{ url_for('video', filename=video_file) }}" type="video/{{ file_type }}">
+			<source src="{{ url_for('upload_video', filename=video_file) }}" type="video/{{ file_type }}">
 		{% endfor %}
 		Your browser does not support the video tag.
 	</video>
