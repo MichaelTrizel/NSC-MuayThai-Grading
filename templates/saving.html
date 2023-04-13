@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500&display=swap" rel="stylesheet">
+	<title>Grading</title>
+	<style>
+		body {
+			font-family: 'Chakra Petch', sans-serif;
+			background-color: #f2f2f2;
+			font-family: Arial, sans-serif;
+			margin: 0;
+			padding: 0;
+		}
+		.loader {
+			border: 16px solid #f3f3f3;
+			border-top: 16px solid #4CAF50;
+			border-radius: 50%;
+			width: 100px;
+			height: 100px;
+			animation: spin 2s linear infinite;
+			margin: auto;
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
+		}
+		@keyframes spin {
+			0% { transform: rotate(0deg); }
+			100% { transform: rotate(360deg); }
+		}
+		.timer {
+			color: #666;
+			font-size: 24px;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			text-align: center;
+			margin-top: 100px;
+		}
+	</style>
+</head>
+<body>
+	<div class="loader"></div>
+	<div class="timer">Saving...</div>
+	<script>
+		var seconds = 0;
+		var timer = setInterval(function() {
+			seconds++;
+			document.querySelector('.timer').innerHTML = 'Saving... ';
+		}, 1000);
+
+		setTimeout(function() {
+			window.location.href = '/validate_record';
+		}, 4000); // Timer (milisecond)
+	</script>
+</body>
+</html>

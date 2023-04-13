@@ -81,9 +81,12 @@ def validate_record():
 	selected_pier = session.get('selected_pier', None)
 	pier = session.get('pier', None)
 
-	folder_path = 'upload_video'
-	num_files = len([f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))])
-	video_file = str(num_files) + '.MOV'
+	video_file = session.get('video_file', None)
+
+	# folder_path = 'upload_video'
+	# num_files = len([f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))])
+	# video_file = str(num_files) + '.MOV'
+
 	print('val_rec')
 	print(video_file)
 
@@ -143,6 +146,10 @@ def find_missing(lst, step):
 		if lst.count(i) == 0:
 			step_missed.append(i)
 	return step_missed
+
+@app.route('/saving')
+def saving():
+	return render_template('saving.html')
 
 @app.route('/loading')
 def loading():
