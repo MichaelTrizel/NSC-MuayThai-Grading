@@ -83,18 +83,29 @@ class MuayThai:
                                 step_data.loc[filt, 'main_node'].iloc[0],
                                 step_data.loc[filt, 'end_node'].iloc[0]))
         return angles
+    
+    def get_step_dict(self):
+        #Use self.true_step to find quantity of sub step in the main step
+        step_counts = self.true_steps['step'].value_counts()
+        step_dict = dict()
+        for i in range(1, len(step_counts)+1):
+            step_dict[i] = [j for j in range(1, step_counts[i]+1)]
+        return step_dict
 
-    #return boolean
+    #return boolean & failed sub step
     def check_sub_step(self, ans_step_data, angles):
         checked_sub_step = 0
+        failed = []
         for sub_step in range(1, len(ans_step_data)+1):
             filt = (ans_step_data['sub_step'] == sub_step)
             compared = eval('{} {} {}'.format(angles[sub_step-1], ans_step_data.loc[filt, 'operator'].iloc[0],
                                         ans_step_data.loc[filt, 'true_angle'].iloc[0]))
-            #print(ans_step_data)
+            
             if compared:
                 checked_sub_step += 1
-        return checked_sub_step == len(ans_step_data)
+            else:
+                failed.append(sub_step)
+        return (checked_sub_step == len(ans_step_data)), failed
 
     def check(self):
         point = 0
@@ -103,6 +114,7 @@ class MuayThai:
         frame_correct = []
         angles_correct = []
         step_correct = []
+        failed_step_dict = self.get_step_dict()
 
         for i in range(len(thresholds)):
             threshold = thresholds[i]
@@ -115,28 +127,30 @@ class MuayThai:
                 #print(angle)
                 all_angles.append(angle)
             step_round = 0
+            
             #Compare angles for every step
-            for step in range(curr_step, self.step+1):
+            for step in range(curr_step, self.step+1):                
                 curr_ans_step_data = self.true_steps[self.true_steps['step'] == step]
-                if self.check_sub_step(curr_ans_step_data, all_angles[step_round]):
+                compared, failed_step = self.check_sub_step(curr_ans_step_data, all_angles[step_round])
+                if len(failed_step) < len(failed_step_dict[step]):
+                    failed_step_dict[step] = failed_step
+                if compared:
                     frame_correct.append(threshold)
                     angles_correct.append(all_angles[step_round])
                     point += 1
                     
                     step_correct.append(curr_ans_step_data['step'].iloc[0])
                     curr_step = step+1
-                    
                     #print('Frame: {}, True angle: {}'.format(int(threshold), all_angles[step_round]))
                     #print('Current point: {}'.format(point))
                     break
-                step_round += 1
-                
+                step_round += 1    
             #print(all_angles)
 
             if point == self.step:
                 break
 
-        return point, frame_correct, angles_correct, step_correct
+        return point, frame_correct, angles_correct, step_correct, failed_step_dict
 
     def get_landmarks(self):
         cap = cv2.VideoCapture(self.path_clip_name)

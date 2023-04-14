@@ -176,9 +176,13 @@ def result():
 		os.makedirs(user_folder)
 
 	user_converter = Conveter(video_path, user_folder)
-	clip_df = user_converter.convert_video_to_node()
+	clip_df, pose_images = user_converter.convert_video_to_node()
 	user_converter.write_video_node_to_csv(clip_df, 'user.csv')
 
+	# Your management
+
+
+	# End
 
 	if pier == "ท่าสลับฟันปลา":
 		true_df = pd.read_csv('./trainer/1/true.csv')
@@ -261,7 +265,7 @@ def result():
 	user_df = pd.read_csv('./user_data/user.csv')
 	del user_df['Unnamed: 0']
 	user_muay = MuayThai(video_path, user_df, 4, true_df, cal_df)
-	user_point, user_true_frames, user_true_angles, user_true_steps = user_muay.check()
+	user_point, user_true_frames, user_true_angles, user_true_steps, user_failed_steps = user_muay.check()
 	#print(user_point)
 
 	# Seperate to each result page
@@ -270,7 +274,7 @@ def result():
 		print('bad1')
 
 		user_backup_muay = MuayThai(video_path, user_df, 4, true_backup_df, cal_df)
-		user_backup_point, user_backup_true_frames, user_backup_true_angles, user_backup_true_steps = user_backup_muay.check()
+		user_backup_point, user_backup_true_frames, user_backup_true_angles, user_backup_true_steps, user_backup_failed_steps = user_backup_muay.check()
 
 		if (user_backup_point < user_backup_muay.step):
 			step_missed = find_missing(user_backup_true_steps, 4)
@@ -278,6 +282,7 @@ def result():
 			#Answer
 			step_missed_str = ', '.join(map(str, step_missed))
 			print(step_missed_str)
+			print(user_backup_failed_steps)
 
 			return render_template('result_2.html', video_file=video_file, pier=pier, step_missed_str=step_missed_str)
 		

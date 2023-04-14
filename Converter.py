@@ -34,6 +34,7 @@ class Conveter:
             clip_big_name = 'test'
             clip_sub_name = f.split('/')[-1].split('.')[0]
             with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
+                pose_images = []
                 while cap.isOpened():
                     threshold += 1
                     showed, frame = cap.read()
@@ -51,6 +52,7 @@ class Conveter:
                         mp_drawing.draw_landmarks(img, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
                         if threshold % diff == 0:
                             #cv2.imshow('Mediapipe Feed', img)
+                            pose_images.append(img)
                             curr_data = []
                             curr_data.append('{}_{}'.format(clip_big_name, clip_sub_name))
                             curr_data.append(threshold)
@@ -66,4 +68,4 @@ class Conveter:
                 cap.release()
                 cv2.destroyAllWindows()
 
-        return clip_df
+        return clip_df, pose_images
