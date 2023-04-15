@@ -27,3 +27,4 @@ htmlcov/
 # Ignore upload_video & user_data
 upload_video/
 user_data/
+pose_images/

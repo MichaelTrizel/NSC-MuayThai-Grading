@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Result</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500&display=swap" rel="stylesheet">
+    <title>MuayThai Grading</title>
     <style>
         body {
+			font-family: 'Chakra Petch', sans-serif;
 			display: flex;
 			flex-direction: column;
 			align-items: center;
@@ -18,10 +22,12 @@
 			margin-top: 15px;
 		}
         table, th, td {
+			font-family: 'Chakra Petch', sans-serif;
             border:1px solid black;
             margin-left: 50px;
         }
 		button {
+			font-family: 'Chakra Petch', sans-serif;
 			width: 80px;
             height: 30px;
 			background-color: #4CAF50;
@@ -38,19 +44,55 @@
 		button:hover {
 			background-color: #3e8e41;
 		}
+		table {
+			border-collapse: collapse;
+			width: 100%;
+		}
+		td, th {
+			border: 1px solid black;
+			padding: 8px;
+			text-align: left;
+		}
+		th {
+			background-color: #f2f2f2;
+		}
     </style>
 </head>
 <body>
     <h1>เกรดการออกท่ามวยไทย</h1>
     <h2>ท่ามวยไทย : {{ pier }}</h2>
-    <h3>Step ที่ยังออกไม่ชัดเจน : Step {{ step_missed_str }}</h3>
 
-    <video width="640" height="360" controls muted>
-        {% for file_type in ['mp4', 'webm', 'ogg', 'quicktime'] %}
-            <source src="{{ url_for('upload_video', filename=video_file) }}" type="video/{{ file_type }}">
-        {% endfor %}
-        Your browser does not support the video tag.
-    </video>
+	<div class="container">
+		<video width="640" height="360" controls muted>
+    	    {% for file_type in ['mp4', 'webm', 'ogg', 'quicktime'] %}
+    	        <source src="{{ url_for('upload_video', filename=video_file) }}" type="video/{{ file_type }}">
+    	    {% endfor %}
+    	    Your browser does not support the video tag.
+    	</video>
+		<div style="margin-left: 30px;">
+			<h3>รายละเอียดของแต่ละ Step ที่ยังออกไม่ชัดเจน</h3>
+			<table>
+				<thead>
+					<tr>
+						<th>Step</th>
+						<th>รายละเอียด</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for key, value in failed_info.items() %}
+					<tr>
+						<td>{{ key }}</td>
+						<td>
+							{% for item in value %}
+							{{ item }}<br>
+							{% endfor %}
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
 
     <button onclick="window.location.href='/'">หน้าหลัก</button>
 </body>

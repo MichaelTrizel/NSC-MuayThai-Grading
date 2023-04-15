@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500&display=swap" rel="stylesheet">
+    <title>MuayThai Grading</title>
+    <style>
+        body {
+            font-family: 'Chakra Petch', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        #img {
+            width: 600px;
+            height: 400px;
+        }
+        .container {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: flex-start;
+			margin-top: 15px;
+            text-align: center;
+        }
+        #left-button {
+            width: 100px;
+            height: 100px;
+            border: none;
+            background-color: white;
+        }
+        .left-arrow {
+            width: 80px;
+            height: 80px;
+        }
+        #right-button {
+            width: 100px;
+            height: 100px;
+            border: none;
+            background-color: white;
+        }
+        .right-arrow {
+            width: 80px;
+            height: 80px;
+        }
+        .button_style {
+            font-family: 'Chakra Petch', sans-serif;
+			width: 150px;
+            height: 30px;
+			background-color: #4CAF50;
+			border: none; 
+			color: white;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block; 
+			font-size: 16px; 
+			margin-top: 20px;
+			cursor: pointer;
+			border-radius: 25px;
+		}
+		.button_style:hover {
+			background-color: #3e8e41;
+		}
+    </style>
+</head>
+<body>
+    <h1>รูปแสดงถึงการจับ Node ของ Mediapipe</h1>
+    <div class="container">
+        <button id="left-button" style="margin-right: 20px;"><img src="{{ url_for('image', filename='left_arrow.png') }}" class="left-arrow"></button>
+        <img id="img" src="{{ url_for('pose_images', filename=pose_images[0]) }}" alt="Image" style="max-width:100%; max-height:100vh;">
+        <button id="right-button" style="margin-left: 20px;"><img src="{{ url_for('image', filename='right_arrow.png') }}" class="right-arrow"></button>
+    </div>
+
+    <div class="container">
+        <button class="button_style" onclick="window.location.href='/grading'">ทำการคิดคะแนน</button>
+        <button class="button_style" style="margin-left: 50px;" onclick="window.location.href='/'">กลับไปหน้าหลัก</button>
+    </div>
+
+    <script>
+        var index = 0;
+        var images = [ {% for image in pose_images %}'{{ image }}', {% endfor %}];
+
+        function showImage() {
+            document.getElementById("img").src = "{{ url_for('pose_images', filename='') }}" + images[index];
+        }
+
+        document.getElementById("left-button").addEventListener("click", function() {
+            if (index == 0) {
+                index = images.length - 1;
+            } else {
+                index--;
+            }
+            showImage();
+        });
+
+        document.getElementById("right-button").addEventListener("click", function() {
+            if (index == images.length - 1) {
+                index = 0;
+            } else {
+                index++;
+            }
+            showImage();
+        });
+    </script>
+</body>
+</html>

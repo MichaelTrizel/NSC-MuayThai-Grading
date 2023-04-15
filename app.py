@@ -8,12 +8,16 @@ import pandas as pd
 from scipy.spatial.distance import euclidean
 from fastdtw import fastdtw
 
+from PIL import Image
+
 from Converter import Conveter
 from MuayThai import MuayThai
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'upload_video'
 app.config['TUTORIAL_FOLDER'] = 'tutorial'
+app.config['IMAGE_FOLDER'] = 'image_assets'
+app.config['POSE_IMAGES'] = 'pose_images'
 app.secret_key = '198237645'
 
 env = Environment()
@@ -30,101 +34,52 @@ def define_pier(selected_pier):
 		pier = "ท่าดับชวาลา"
 	elif selected_pier == "pier5":
 		pier = "ท่าหักคอเอราวัณ"
-
 	return pier
 
 @app.route('/')
 def index():
 	return render_template('index.html')
 
-@app.route('/video', methods=['GET', 'POST'])
-def video():
-	selected_pier = request.form['pier']
-	session['selected_pier'] = selected_pier
-	pier = define_pier(selected_pier)
-	session['pier'] = pier
-
-	video_method = request.form['video_method']
-	if video_method == "method1":
-		return render_template('uploaded.html', pier=pier)
-	elif video_method == "method2":
-		return render_template('record.html', pier=pier)
-
-@app.route('/upload', methods=['GET', 'POST'])
-def upload():
-	upload_folder = './upload_video/'
-	if 'video' not in request.files:
-		return 'No video file uploaded', 400
-	
-	video = request.files['video']
-	folder_path = 'upload_video'
-	if not os.path.exists(folder_path):
-		os.makedirs(folder_path)
-
-	num_files = len([f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))])
-	# print(f'The folder contains {num_files} files.')
-	video_file = str(num_files + 1) + '.MOV'
-	video_path = os.path.join(upload_folder, video_file)
-	print('Upload Section')
-	print(video_path)
-	print(video_file)
-
-	session['video_path'] = video_path
-	session['video_file'] = video_file
-
-	video.save(os.path.join(folder_path, video_file))
-
-	return 'Woking'
-
-@app.route('/validate_record', methods=['GET', 'POST'])
-def validate_record():
-	selected_pier = session.get('selected_pier', None)
-	pier = session.get('pier', None)
-
-	video_file = session.get('video_file', None)
-
-	# folder_path = 'upload_video'
-	# num_files = len([f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))])
-	# video_file = str(num_files) + '.MOV'
-
-	print('val_rec')
-	print(video_file)
-
-	return render_template(selected_pier + '.html', video_file=video_file, pier=pier)
-
-@app.route('/validate_upload', methods=['GET', 'POST'])
-def validate_upload():
+@app.route('/validate', methods=['GET', 'POST'])
+def validate():
 	upload_folder = './upload_video/'
 	if not os.path.exists(upload_folder):
 		os.makedirs(upload_folder)
 
-	selected_pier = session.get('selected_pier',None)
-	pier = session.get('pier',None)
-
 	if request.method == 'POST':
+		# Check if pier is selected
+		if 'pier' not in request.form:
+			error_message = 'กรุณาเลือกท่ามวยไทยที่ต้องการประเมินด้วย'
+			return render_template('error.html', error_message=error_message)
+		
 		# Check if file is uploaded
 		if 'video' not in request.files:
-			return render_template('error2.html')
-
-		video_file = request.files['video']
+			error_message = 'กรุณาอัปโหลดคลิปที่ต้องการประเมินด้วย'
+			return render_template('error.html', error_message=error_message)
+		
 		# Check if file is not empty
+		video_file = request.files['video']
 		if video_file.filename == '':
-			return render_template('error2.html')
+			error_message = 'กรุณาอัปโหลดคลิปที่ต้องการประเมินด้วย'
+			return render_template('error.html', error_message=error_message)
 
-		# Save file to upload folder
+		# Save file to upload_video folder + rename the file
 		num_files = len([f for f in os.listdir('upload_video') if os.path.isfile(os.path.join('upload_video', f))])
-		# print(f'The folder contains {num_files} files.')
 		video_name = str(num_files + 1) + '.MOV'
 		video_path = os.path.join(upload_folder, video_name)
 		video_file.save(video_path)
-		# print(video_file.filename)
-		# print(video_path)
 
+		# Define the selected pier
+		selected_pier = request.form['pier']
+		pier = define_pier(selected_pier)
+
+		# Put the value into session
+		session['selected_pier'] = selected_pier
+		session['pier'] = pier
 		session['video_path'] = video_path
 		session['video_file'] = video_name
-		# print(video_path)
 
-		return render_template(selected_pier + '.html', video_file=video_name, pier=pier)
+		return render_template('pier.html', video_file=video_name, pier=pier)
 	else:
 		return render_template('index.html')
 
@@ -136,9 +91,13 @@ def upload_video(filename):
 def tutorial(filename):
 	return send_from_directory(app.config['TUTORIAL_FOLDER'], filename)
 
-# @app.route('/upload_image/<filename>')
-# def image(filename):
-# 	return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+@app.route('/image/<filename>')
+def image(filename):
+	return send_from_directory(app.config['IMAGE_FOLDER'], filename)
+
+@app.route('/pose_images/<filename>')
+def pose_images(filename):
+	return send_from_directory(app.config['POSE_IMAGES'], filename)
 
 def find_missing(lst, step):
 	step_missed = []
@@ -147,30 +106,19 @@ def find_missing(lst, step):
 			step_missed.append(i)
 	return step_missed
 
-@app.route('/saving')
-def saving():
-	return render_template('saving.html')
-
 @app.route('/loading')
 def loading():
 	return render_template('loading.html')
 
-@app.route('/result')
-def result():
-	video_file = session.get('video_file',None)
-	pier = session.get('pier',None)
+@app.route('/grading')
+def grading():
+	return render_template('grading.html')
+
+@app.route('/check')
+def check():
 	video_path = session.get('video_path',None)
 
-	print('Result Sec')
-	print(video_file)
-	print(video_path)
-	print(pier)
-
-	# if video_file is None or pier is None:
-	# 	return redirect('/')
-	# return render_template('loading.html', video_file=video_file, pier=pier)
-
-	#Model code
+	# Model code
 	user_folder = './user_data/'
 	if not os.path.exists(user_folder):
 		os.makedirs(user_folder)
@@ -179,10 +127,29 @@ def result():
 	clip_df, pose_images = user_converter.convert_video_to_node()
 	user_converter.write_video_node_to_csv(clip_df, 'user.csv')
 
-	# Your management
+	# Create folder to store pose_images image
+	pose_images_folder = './pose_images'
+	if not os.path.exists(pose_images_folder):
+		os.makedirs(pose_images_folder)
 
+	# Save each ndarray as an image file
+	image_filenames = []
+	for i, image in enumerate(pose_images):
+		# Convert the color channels to RGB order by reversing the order of the last axis
+		image = image[..., ::-1]
 
-	# End
+		# Save ndarray to image and save to folder
+		image_filename = f'{pose_images_folder}/pose{i}.jpg'
+		Image.fromarray(image).save(image_filename)
+		image_filenames.append('pose' + str(i) + '.jpg')
+	
+	return render_template('check.html', pose_images=image_filenames)
+
+@app.route('/result')
+def result():
+	video_file = session.get('video_file',None)
+	pier = session.get('pier',None)
+	video_path = session.get('video_path',None)
 
 	if pier == "ท่าสลับฟันปลา":
 		true_df = pd.read_csv('./trainer/1/true.csv')
@@ -204,6 +171,7 @@ def result():
 		cal_df =pd.read_csv('./trainer/6/cal.csv')
 		trainer_df = pd.read_csv('./trainer/6/clip.csv')
 		true_backup_df = pd.read_csv('./trainer/6/true_backup.csv')
+		failed_df = pd.read_csv('./trainer/6/failed.csv')
 
 		#Dtw
 		number_pier = 6
@@ -219,6 +187,7 @@ def result():
 		cal_df = pd.read_csv('./trainer/7/cal.csv')
 		trainer_df = pd.read_csv('./trainer/7/clip.csv')
 		true_backup_df = pd.read_csv('./trainer/7/true_backup.csv')
+		failed_df = pd.read_csv('./trainer/7/failed.csv')
 
 		#Dtw
 		number_pier = 7
@@ -234,6 +203,7 @@ def result():
 		cal_df = pd.read_csv('./trainer/13/cal.csv')
 		trainer_df = pd.read_csv('./trainer/13/clip.csv')
 		true_backup_df = pd.read_csv('./trainer/13/true_backup.csv')
+		failed_df = pd.read_csv('./trainer/13/failed.csv')
 
 		#Dtw
 		number_pier = 13
@@ -249,6 +219,7 @@ def result():
 		cal_df = pd.read_csv('./trainer/15/cal.csv')
 		trainer_df = pd.read_csv('./trainer/15/clip.csv')
 		true_backup_df = pd.read_csv('./trainer/15/true_backup.csv')
+		failed_df = pd.read_csv('./trainer/15/failed.csv')
 
 		#Dtw
 		number_pier = 15
@@ -261,6 +232,7 @@ def result():
 
 	del true_df['Unnamed: 0']
 	del cal_df['Unnamed: 0']
+	del failed_df['Unnamed: 0']
 
 	user_df = pd.read_csv('./user_data/user.csv')
 	del user_df['Unnamed: 0']
@@ -271,7 +243,7 @@ def result():
 	# Seperate to each result page
 	# This is result_2 
 	if (user_point < user_muay.step):
-		print('bad1')
+		print('bad')
 
 		user_backup_muay = MuayThai(video_path, user_df, 4, true_backup_df, cal_df)
 		user_backup_point, user_backup_true_frames, user_backup_true_angles, user_backup_true_steps, user_backup_failed_steps = user_backup_muay.check()
@@ -284,7 +256,18 @@ def result():
 			print(step_missed_str)
 			print(user_backup_failed_steps)
 
-			return render_template('result_2.html', video_file=video_file, pier=pier, step_missed_str=step_missed_str)
+			# Get detail for failed step
+			failed_info = {}
+			for step, ls_sub in user_backup_failed_steps.items():
+				if len(ls_sub) != 0:
+					temp = []
+					for sub_step in ls_sub:
+						failed_label = failed_df.loc[(failed_df['step'] == step) & (failed_df['sub_step'] == sub_step), 'failed_label'].iloc[0]
+						temp.append(failed_label)
+					failed_info[step] = temp
+			# print(failed_info)
+
+			return render_template('result_2.html', video_file=video_file, pier=pier, step_missed_str=step_missed_str, failed_info=failed_info)
 		
 		user_true_angles = user_backup_true_angles
 	
@@ -302,7 +285,7 @@ def result():
 						trainer_df[trainer_df['clip_name'] == '{}_{}'.format(number_pier, i)], 
 						4, true_df, cal_df)
 		
-		trainer_point, trainer_true_frames, trainer_true_angles, trainer_true_steps = trainer_muay.check()
+		trainer_point, trainer_true_frames, trainer_true_angles, trainer_true_steps, trainer_failed_steps = trainer_muay.check()
 		max_angles_len_train = len(max(trainer_true_angles, key=len))
 		trainer_padding_angle = [np.pad(arr, 
 								pad_width=max_angles_len_train-len(arr), 
@@ -336,22 +319,6 @@ def result():
 	similarity = round(similarity, 2)
 	return render_template('result_1.html', video_file=video_file, pier=pier, similarity=similarity, grade=grade)
 	#End of model code
-
-# @app.route('/result_1')
-# def result_1():
-# 	video_file = session.get('video_file',None)
-# 	pier = session.get('pier',None)
-# 	if video_file is None or pier is None:
-# 		return redirect('/')
-# 	return render_template('result_1.html', video_file=video_file, pier=pier)
-
-# @app.route('/result_2')
-# def result_2():
-# 	video_file = session.get('video_file',None)
-# 	pier = session.get('pier',None)
-# 	if video_file is None or pier is None:
-# 		return redirect('/')
-# 	return render_template('result_2.html', video_file=video_file, pier=pier)
 
 if __name__ == '__main__':
     app.run(debug=True)

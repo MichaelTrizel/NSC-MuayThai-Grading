@@ -4,7 +4,7 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500&display=swap" rel="stylesheet">
-	<title>ท่าดับชวาลา</title>
+	<title>MuayThai Grading</title>
 	<style>
 		body {
 			font-family: 'Chakra Petch', sans-serif;
@@ -32,29 +32,10 @@
 		button:hover {
 			background-color: #3e8e41;
 		}
-		.container {
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-			justify-content: flex-start;
-			margin-top: 15px;
-		}
 	</style>
 </head>
 <body>
-    <h1>ท่าดับชวาลา</h1>
-	
-	<video width="640" height="360" controls muted>
-		{% for file_type in ['mp4', 'webm', 'ogg', 'quicktime'] %}
-			<source src="{{ url_for('upload_video', filename=video_file) }}" type="video/{{ file_type }}">
-		{% endfor %}
-		Your browser does not support the video tag.
-	</video>
-
-	<div class=".container">
-		<button onclick="window.location.href='/loading'" style="margin-right: 400px;">คิดคะแนน</button>
-		<button onclick="window.location.href='/'">ย้อนกลับ</button>
-	</div>
-
+	<h1>{{ error_message }}</h1>
+    <button onclick="window.location.href='/'">ย้อนกลับ</button>
 </body>
 </html>

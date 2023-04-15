@@ -4,7 +4,7 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500&display=swap" rel="stylesheet">
-	<title>Grading</title>
+	<title>MuayThai Grading</title>
 	<style>
 		body {
 			font-family: 'Chakra Petch', sans-serif;
@@ -45,17 +45,17 @@
 </head>
 <body>
 	<div class="loader"></div>
-	<div class="timer">Saving...</div>
+	<div class="timer">Grading...</div>
 	<script>
 		var seconds = 0;
 		var timer = setInterval(function() {
 			seconds++;
-			document.querySelector('.timer').innerHTML = 'Saving... ';
+			document.querySelector('.timer').innerHTML = 'Grading... ';
 		}, 1000);
 
 		setTimeout(function() {
-			window.location.href = '/validate_record';
-		}, 4000); // Timer (milisecond)
+			window.location.href = '/result';
+		}, 1000); // Timer (milisecond)
 	</script>
 </body>
 </html>
