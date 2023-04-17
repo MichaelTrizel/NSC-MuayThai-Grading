@@ -51,35 +51,37 @@
 	<script>
 		function showVideo(videoURL) {
 			var video = document.getElementById("video");
+			var image = document.getElementById("image");
 			video.src = "{{ url_for('tutorial', filename='') }}" + videoURL + '.mp4';
 			video.type = "video/mp4"
 			video.style.display = "block";
+			image.src = "{{ url_for('image', filename='') }}" + videoURL + '.png';
+			image.style.display = "block";
 		}
 	</script>
 </head>
 <body>
 	<h1>โปรแกรมประเมินการออกท่ามวยไทย</h1>
-
-	<div class="container">
-		<form action="/validate" method="POST" enctype="multipart/form-data">
-			<label>กรุณาเลือกท่ามวยไทย</label>
-			<select name="pier" onchange="showVideo(this.value)">
-				<option value="default" selected disabled hidden>ท่ามวยไทย</option>
-				<option value="pier1">ท่าสลับฟันปลา</option>
-				<option value="pier2">ท่าตาเถรค้ำพัก</option>
-				<option value="pier3">ท่ามอญยันหลัก</option>
-				<option value="pier4">ท่าดับชวาลา</option>
-				<option value="pier5">ท่าหักคอเอราวัณ</option>
-			</select>
-			<br><br>
-			<video id="video" style="display: none;" controls muted></video>
-			<br>
-			<label>Upload video:</label>
-			<input type="file" name="video">
-			<br><br>
-			<input type="submit" class="my-input my-input:hover" value="Submit">
-		</form>
-	</div>
-
+	<form action="/validate" method="POST" enctype="multipart/form-data">
+		<label>กรุณาเลือกท่ามวยไทย</label>
+		<select name="pier" onchange="showVideo(this.value)">
+			<option value="default" selected disabled hidden>ท่ามวยไทย</option>
+			<option value="pier1">ท่าสลับฟันปลา</option>
+			<option value="pier2">ท่าตาเถรค้ำพัก</option>
+			<option value="pier3">ท่ามอญยันหลัก</option>
+			<option value="pier4">ท่าดับชวาลา</option>
+			<option value="pier5">ท่าหักคอเอราวัณ</option>
+		</select>
+		<br><br>
+		<div class="container">
+			<video id="video" style="display: none;" controls muted loop></video>
+			<img id="image" style="display: none; margin-left: 50px;">
+		</div>
+		<br>
+		<label>Upload video:</label>
+		<input type="file" name="video">
+		<br><br>
+		<input type="submit" class="my-input my-input:hover" value="Submit">
+	</form>
 </body>
 </html>
