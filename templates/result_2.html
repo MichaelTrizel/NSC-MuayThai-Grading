@@ -6,13 +6,13 @@
 	<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500&display=swap" rel="stylesheet">
     <title>MuayThai Grading</title>
     <style>
-        body {
+        section {
 			font-family: 'Chakra Petch', sans-serif;
 			display: flex;
 			flex-direction: column;
 			align-items: center;
 			justify-content: center;
-			height: 100vh;
+			height: 80vh;
 		}
         .container {
 			display: flex;
@@ -59,41 +59,47 @@
     </style>
 </head>
 <body>
-    <h1>เกรดการออกท่ามวยไทย</h1>
-    <h2>ท่ามวยไทย : {{ pier }}</h2>
+	<img id="img" src="{{ url_for('image', filename='nsc_logo.png') }}" alt="Image" style="height: 80px; width: 80px;">
+	<img id="img" src="{{ url_for('image', filename='ku_logo.png') }}" alt="Image" style="height: 80px; width: 80px; margin-left: 10px;">
+	<section>
+    	<h1>เกรดการออกท่ามวยไทย</h1>
+    	<h2>ท่ามวยไทย : {{ pier }}</h2>
 
-	<div class="container">
-		<video width="640" height="360" controls muted>
-    	    {% for file_type in ['mp4', 'webm', 'ogg', 'quicktime'] %}
-    	        <source src="{{ url_for('upload_video', filename=video_file) }}" type="video/{{ file_type }}">
-    	    {% endfor %}
-    	    Your browser does not support the video tag.
-    	</video>
-		<div style="margin-left: 30px;">
-			<h3>รายละเอียดของแต่ละ Step ที่ยังออกไม่ชัดเจน</h3>
-			<table>
-				<thead>
-					<tr>
-						<th>Step</th>
-						<th>รายละเอียด</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for key, value in failed_info.items() %}
-					<tr>
-						<td>{{ key }}</td>
-						<td>
-							{% for item in value %}
-							{{ item }}<br>
-							{% endfor %}
-						</td>
-					</tr>
-					{% endfor %}
-				</tbody>
-			</table>
+		<div class="container">
+			<video width="640" height="360" controls muted>
+    		    {% for file_type in ['mp4', 'webm', 'ogg', 'quicktime'] %}
+    		        <source src="{{ url_for('upload_video', filename=video_file) }}" type="video/{{ file_type }}">
+    		    {% endfor %}
+    		    Your browser does not support the video tag.
+    		</video>
+
+			<div style="margin-left: 30px;">
+				<h3>รายละเอียดของแต่ละ Step ที่ยังออกไม่ชัดเจน</h3>
+				<table>
+					<thead>
+						<tr>
+							<th>Step</th>
+							<th>รายละเอียด</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for key, value in failed_info.items() %}
+						<tr>
+							<td>{{ key }}</td>
+							<td>
+								{% for item in value %}
+								{{ item }}<br>
+								{% endfor %}
+							</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+			
 		</div>
-	</div>
-
-    <button onclick="window.location.href='/'">หน้าหลัก</button>
+		
+    	<button onclick="window.location.href='/'">หน้าหลัก</button>
+	</section>
 </body>
 </html>

@@ -6,13 +6,13 @@
 	<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500&display=swap" rel="stylesheet">
 	<title>MuayThai Grading</title>
 	<style>
-		body {
+		section {
 			font-family: 'Chakra Petch', sans-serif;
 			display: flex;
 			flex-direction: column;
 			align-items: center;
 			justify-content: center;
-			height: 100vh;
+			height: 80vh;
 		}
 		button {
 			font-family: 'Chakra Petch', sans-serif;
@@ -35,7 +35,12 @@
 	</style>
 </head>
 <body>
-	<h1>{{ error_message }}</h1>
-    <button onclick="window.location.href='/'">ย้อนกลับ</button>
+	<img src="{{ url_for('image', filename='nsc_logo.png') }}" alt="Image" style="height: 80px; width: 80px;">
+	<img id="img" src="{{ url_for('image', filename='ku_logo.png') }}" alt="Image" style="height: 80px; width: 80px; margin-left: 10px;">
+	<section>
+		<h1>{{ error_message }}</h1>
+
+   		<button onclick="window.location.href='/'">ย้อนกลับ</button>
+	</section>
 </body>
 </html>

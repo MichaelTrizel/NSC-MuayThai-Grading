@@ -54,13 +54,20 @@ def validate():
 		
 		# Check if file is uploaded
 		if 'video' not in request.files:
-			error_message = 'กรุณาอัปโหลดคลิปที่ต้องการประเมินด้วย'
+			error_message = 'กรุณาอัพโหลดคลิปที่ต้องการประเมินด้วย'
 			return render_template('error.html', error_message=error_message)
 		
 		# Check if file is not empty
 		video_file = request.files['video']
 		if video_file.filename == '':
-			error_message = 'กรุณาอัปโหลดคลิปที่ต้องการประเมินด้วย'
+			error_message = 'กรุณาอัพโหลดคลิปที่ต้องการประเมินด้วย'
+			return render_template('error.html', error_message=error_message)
+		
+		# Check if file is a video
+		video_check = video_file.filename.split('.')
+		video_tag = ['mp4', 'mov', 'webm', 'avi', 'wmv']
+		if video_check[-1].lower() not in video_tag:
+			error_message = 'กรุณาอัพโหลดไฟล์วิดีโอ'
 			return render_template('error.html', error_message=error_message)
 
 		# Save file to upload_video folder + rename the file

@@ -6,7 +6,7 @@
 	<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500&display=swap" rel="stylesheet">
     <title>MuayThai Grading</title>
     <style>
-        body {
+        section {
             font-family: 'Chakra Petch', sans-serif;
             display: flex;
             flex-direction: column;
@@ -66,17 +66,21 @@
     </style>
 </head>
 <body>
-    <h1>รูปแสดงถึงการจับ Node ของ Mediapipe</h1>
-    <div class="container">
-        <button id="left-button" style="margin-right: 20px;"><img src="{{ url_for('image', filename='left_arrow.png') }}" class="left-arrow"></button>
-        <img id="img" src="{{ url_for('pose_images', filename=pose_images[0]) }}" alt="Image" style="max-width:100%; max-height:100vh;">
-        <button id="right-button" style="margin-left: 20px;"><img src="{{ url_for('image', filename='right_arrow.png') }}" class="right-arrow"></button>
-    </div>
+    <img src="{{ url_for('image', filename='nsc_logo.png') }}" alt="Image" style="height: 80px; width: 80px;">
+    <img src="{{ url_for('image', filename='ku_logo.png') }}" alt="Image" style="height: 80px; width: 80px; margin-left: 10px;">
+    <section>
+        <h1>รูปแสดงถึงการจับ Node ของ Mediapipe</h1>
+        <div class="container">
+            <button id="left-button" style="margin-right: 20px;"><img src="{{ url_for('image', filename='left_arrow.png') }}" class="left-arrow"></button>
+            <img id="img" src="{{ url_for('pose_images', filename=pose_images[0]) }}" alt="Image" style="max-width:100%; max-height:100vh;">
+            <button id="right-button" style="margin-left: 20px;"><img src="{{ url_for('image', filename='right_arrow.png') }}" class="right-arrow"></button>
+        </div>
 
-    <div class="container">
-        <button class="button_style" onclick="window.location.href='/grading'">ทำการคิดคะแนน</button>
-        <button class="button_style" style="margin-left: 50px;" onclick="window.location.href='/'">กลับไปหน้าหลัก</button>
-    </div>
+        <div class="container">
+            <button class="button_style" onclick="window.location.href='/grading'">ทำการคิดคะแนน</button>
+            <button class="button_style" style="margin-left: 50px;" onclick="window.location.href='/'">กลับไปหน้าหลัก</button>
+        </div>
+    </section>
 
     <script>
         var index = 0;
