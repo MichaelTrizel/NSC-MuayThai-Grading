@@ -14,6 +14,12 @@
 			justify-content: center;
 			height: 70vh;
 		}
+		nav {
+			font-family: 'Chakra Petch', sans-serif;
+		}
+		footer {
+			font-family: 'Chakra Petch', sans-serif;
+		}
 		.my-input {
 			width: 80px;
             height: 30px;
@@ -61,12 +67,13 @@
 	</script>
 </head>
 <body>
-	<img id="img" src="{{ url_for('image', filename='nsc_logo.png') }}" alt="Image" style="height: 80px; width: 80px;">
-	<img id="img" src="{{ url_for('image', filename='ku_logo.png') }}" alt="Image" style="height: 80px; width: 80px; margin-left: 10px;">
-	<section>
-		<h1>โปรแกรมประเมินการออกท่ามวยไทย</h1>
-
-		<form action="/validate" method="POST" enctype="multipart/form-data">
+	<nav class="container">
+		<img id="img" src="{{ url_for('image', filename='nsc_logo.png') }}" alt="Image" style="height: 80px; width: 80px;">
+		<img id="img" src="{{ url_for('image', filename='ku_logo.png') }}" alt="Image" style="height: 80px; width: 80px; margin-left: 10px;">
+		<h1 style="margin-left: 50vh;">โปรแกรมประเมินการออกท่ามวยไทย</h1>
+	</nav>
+	<form action="/validate" method="POST" enctype="multipart/form-data">
+		<nav style="margin-left: 80vh;">
 			<label>กรุณาเลือกท่ามวยไทย</label>
 			<select name="pier" onchange="showVideo(this.value)">
 				<option value="default" selected disabled hidden>ท่ามวยไทย</option>
@@ -76,23 +83,19 @@
 				<option value="pier4">ท่าดับชวาลา</option>
 				<option value="pier5">ท่าหักคอเอราวัณ</option>
 			</select>
-
-			<br><br>
-
+		</nav>
+		<section>
 			<div class="container">
 				<video id="video" style="display: none;" controls muted loop></video>
 				<img id="image" style="display: none; margin-left: 50px;">
 			</div>
-
-			<br>
-
+		</section>
+		<footer style="margin-left: 80vh;">
 			<label>Upload video:</label>
 			<input type="file" name="video">
-
 			<br><br>
-			
-			<input type="submit" class="my-input my-input:hover" value="Submit">
-		</form>
-	</section>
+			<input type="submit" class="my-input my-input:hover" style="margin-left: 10vh;" value="Submit">
+		</footer>	
+	</form>	
 </body>
 </html>

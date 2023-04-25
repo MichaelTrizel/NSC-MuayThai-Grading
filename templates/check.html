@@ -32,8 +32,8 @@
             background-color: white;
         }
         .left-arrow {
-            width: 80px;
-            height: 80px;
+            width: 60px;
+            height: 60px;
         }
         #right-button {
             width: 100px;
@@ -42,8 +42,8 @@
             background-color: white;
         }
         .right-arrow {
-            width: 80px;
-            height: 80px;
+            width: 60px;
+            height: 60px;
         }
         .button_style {
             font-family: 'Chakra Petch', sans-serif;
@@ -63,6 +63,16 @@
 		.button_style:hover {
 			background-color: #3e8e41;
 		}
+        .circle {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin: 0 5px;
+            background-color: black;
+        }
+        .circle.active {
+            background-color: rgb(0, 255, 0);
+        }
     </style>
 </head>
 <body>
@@ -75,6 +85,11 @@
             <img id="img" src="{{ url_for('pose_images', filename=pose_images[0]) }}" alt="Image" style="max-width:100%; max-height:100vh;">
             <button id="right-button" style="margin-left: 20px;"><img src="{{ url_for('image', filename='right_arrow.png') }}" class="right-arrow"></button>
         </div>
+        <div id="indicator" style="display:flex; justify-content:center; margin-top:20px;">
+            {% for image in pose_images %}
+                <div class="circle {% if loop.index0 == 0 %}active{% endif %}"></div>
+            {% endfor %}
+        </div>
 
         <div class="container">
             <button class="button_style" onclick="window.location.href='/grading'">ทำการคิดคะแนน</button>
@@ -85,11 +100,25 @@
     <script>
         var index = 0;
         var images = [ {% for image in pose_images %}'{{ image }}', {% endfor %}];
-
+        var startX;
+        var startY;
+    
         function showImage() {
             document.getElementById("img").src = "{{ url_for('pose_images', filename='') }}" + images[index];
+            updateIndicator();
         }
-
+    
+        function updateIndicator() {
+            var circles = document.querySelectorAll(".circle");
+            circles.forEach(function(circle, i) {
+                if (i == index) {
+                    circle.classList.add("active");
+                } else {
+                    circle.classList.remove("active");
+                }
+            });
+        }
+    
         document.getElementById("left-button").addEventListener("click", function() {
             if (index == 0) {
                 index = images.length - 1;
@@ -98,7 +127,7 @@
             }
             showImage();
         });
-
+    
         document.getElementById("right-button").addEventListener("click", function() {
             if (index == images.length - 1) {
                 index = 0;
@@ -106,6 +135,40 @@
                 index++;
             }
             showImage();
+        });
+    
+        document.getElementById("img").addEventListener("mousedown", function(e) {
+            startX = e.clientX;
+            startY = e.clientY;
+        });
+    
+        document.getElementById("img").addEventListener("mouseup", function(e) {
+            var endX = e.clientX;
+            var endY = e.clientY;
+            var diffX = endX - startX;
+            var diffY = endY - startY;
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                if (diffX > 0) {
+                    // drag to the right
+                    if (index == 0) {
+                        index = images.length - 1;
+                    } else {
+                        index--;
+                    }
+                } else {
+                    // drag to the left
+                    if (index == images.length - 1) {
+                        index = 0;
+                    } else {
+                        index++;
+                    }
+                }
+                showImage();
+            }
+        });
+    
+        document.getElementById("img").addEventListener("mousemove", function(e) {
+            e.preventDefault();
         });
     </script>
 </body>
