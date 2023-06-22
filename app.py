@@ -163,10 +163,11 @@ def result():
 		cal_df = pd.read_csv('./trainer/1/cal.csv')
 		trainer_df = pd.read_csv('./trainer/1/clip.csv')
 		true_backup_df = pd.read_csv('./trainer/1/true_backup.csv')
+		failed_df = pd.read_csv('./trainer/1/failed.csv')
 
 		#Dtw
 		number_pier = 1
-		distance_point = 50
+		distance_point = 150
 
 		#Grading
 		grade_df = pd.read_csv('./trainer/1/grade.csv')
