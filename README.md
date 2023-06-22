@@ -3,9 +3,8 @@
 - **Updated program** 22/06/2023
 
 ## **Getting Started**
----
 
-## **Prerequisites**
+### **Prerequisites**
 
 Before you install this program, you must install **python** in your computer. This program require to use python **version 3.8 - 3.10** for run Mediapipe.
 
@@ -16,7 +15,7 @@ Before you install this program, you must install **python** in your computer. T
     ```
 * If you want to change python version that appropriate this program, you can find and download your wanted python version in your browser. And install it in your computer. Check python version again with the above command.
 
-## **Installtion**
+### **Installtion**
 
 1. Clone your project into your computer directory.
     
